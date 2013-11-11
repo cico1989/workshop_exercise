@@ -51,7 +51,7 @@ for file in os.listdir(folder_path):
         for i in range(0,12):
             f.write("%2d  %.6f  mm/month\n" % (i+1,monthly_mean[i]))
         f.close()
-        area_factor = 30901073.51*np.cos(float(lat)*np.pi/180)
+        area_factor = 3090078230*np.cos(float(lat)*np.pi/180)
 #        print area_factor
         temp1_path = os.path.join(results_path,'temp1')  
         for i in range(0,12):
