@@ -1,0 +1,33 @@
+#!/bin/bash
+#Program:Get mean monthly precipitation value (column4) of each month (column2) for each file.
+
+echo -e "mean Janurary rainfall:\nmean February rainfall:\nmean March rainfall:\nmean April rainfall:\nmean May rainfall:\nmean June rainfall:\nmean July rainfall:\nmean August rainfall:\nmean September rainfall:\nmean October rainfall:\nmean November rainfall:\nmean December rainfall:" > ../results/temp1
+for file in `find fluxes*`;
+do
+#Get the numbers in file name
+position=`echo $file | cut -d "_" -f 2`_`echo $file | cut -d "_" -f 3`
+#Get the sum of precipitation for one month and then divide the sum by number of years
+awk '{total[$2] += $4; count[$1]++} END {num=asort(count); for(month in total) printf "%f  mm/month %s\n",total[month]/num,month}' $file | sort -k 3 -n | awk '{printf "%f %s",$1,$2}' > ../results/temp2.$position
+paste ../results/temp1 ../results/temp2.$position > ../results/monthly_precipitation_$position #| echo ../results/monthly_precipitation_$position
+echo $file | cut -d "_" -f 2 > ../results/latitude.$position
+awk '{$2=30901073.51*(1-$1^2/2+$1^4/24-$1^6/720+$1^8/40320)} END {print $2}' ../results/latitude.$position > ../results/area_$position #| echo ../results/area_$position
+#echo $file
+done
+
+for file in `find fluxes*`;
+do
+position=`echo $file | cut -d "_" -f 2`_`echo $file | cut -d "_" -f 3`
+head -n 1 ../results/monthly_precipitation_$position | awk '{print $4}'# > ../results/temp3_$position.1
+head -n 2 ../results/monthly_precipitation_$position | tail -n 1 | awk '{print $4}'# > ../results/temp3_$position.2 
+#paste ../results/temp3_$position.$i ../results/area_$position >> ../results/pa_$i 
+done
+
+#echo -e "areal average Janurary rainfall:\nareal average February rainfall:\nareal average March rainfall:\nareal average April rainfall:\nareal average May rainfall:\nareal average June rainfall:\nareal average July rainfall:\nareal average August rainfall:\nareal average September rainfall:\nareal average October rainfal:\nareal average November rainfall:\nareal average December rainfall:" > ../results/temp4
+#for file in `find ../results/pa*`
+#do
+#awk '{suma += $1*$2; sumb += $2} END {printf "%f mm/month\n",suma/sumb}' $file #>> ../results/temp5
+#echo $file | cut -d "_" -f 2 >> ../results/temp6
+#paste ../results/temp6 ../results/temp5 | sort -k 1 -n > ../results/areal_average
+#done
+
+

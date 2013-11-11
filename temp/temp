@@ -1,0 +1,40 @@
+01=`echo Januray`
+02=`echo February` 
+03=`echo March` 
+04=`echo April` 
+05=`echo May` 
+06=`echo June` 
+07=`echo July` 
+08=`echo August` 
+09=`echo September` 
+10=`echo October` 
+11=`echo November` 
+12=`echo December`
+
+$01=Januray
+$02=February 
+set 03=March 
+set 04=April
+set 05=May 
+set 06=June 
+set 07=July 
+set 08=August
+set 09=September 
+set 10=October 
+set 11=November
+set 12=December
+
+01=Januray
+02=February
+03=March 
+04=April
+05=May 
+06=June 
+07=July 
+08=August
+09=September 
+10=October 
+11=November
+12=December
+
+ 01=Januray; 02=February; 03=March; 04=April; 05=May; 06=June; 07=July; 08=August; 09=September; 10=October; 11=November; 12=December;

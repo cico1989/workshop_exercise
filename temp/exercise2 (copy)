@@ -1,0 +1,11 @@
+#!/bin/bash
+#Program:Get mean monthly precipitation value (column4) of each month (column2) for each file.
+
+
+awk '{for(i=1;i<NF+1;i++) sum[i] += $i}  END {for(i=1;i<NF+1;i++) printf "column%4s:%20.4f\n",i,sum[i]/NR}' fluxes_-15.2500_39.2500
+
+#Get the sum of precipitation for one month and then divide the sum by number of years
+awk '{total[$2] += $4; count[$1]++} END {num=asort(count);for(month in total) printf "%4s:%15.4f\n",month,total[month]/num}' fluxes_-15.2500_39.2500 | sort -k 1 -n
+
+#Get the monthly precipitation for each year and then get the mean monthly rainfall
+awk '{total[$1,$2] += $4;count1[$1]++} END {num1=asort(count1);for(year in total) {split(year,total1,SUBSEP); sum[month]+=total1[year]};for(month in mean) {mean[month]=sum[month]/num1; printf "%4s:%15.4f\n",month,mean[month]}}' fluxes_-15.2500_39.2500 | sort -k 1 -n

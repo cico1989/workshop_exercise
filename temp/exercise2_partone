@@ -1,0 +1,12 @@
+#!/bin/bash
+#Program:Get mean monthly precipitation value (column4) of each month (column2) for each file.
+
+for file in `find fluxes*`;
+do
+#Get the numbers in file name
+position=`echo $file | cut -d "_" -f 2`_`echo $file | cut -d "_" -f 3`
+title=(Janurary February March April May June July August September October November December)
+#Get the sum of precipitation for one month and then divide the sum by number of years
+awk '{total[$2] += $4; count[$1]++} END {num=asort(count); for(month in total) printf "mean %4s rainfall: %15.4f  mm/month\n",month,total[month]/num}' $file | sort -k 1 -n > ../results/monthly_precipitation.$position
+done
+

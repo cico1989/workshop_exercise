@@ -1,0 +1,34 @@
+#!/bin/bash
+#Program:Get mean monthly precipitation value (column4) of each month (column2) for each file.
+#This file is placed in the same directory of input files. All files are generated in the upper-level folder named 'results'.
+#Planed to use another computing method and then use diff to compare, but haven't made this work yet. So only test a small part of it by comparing to excel results. 
+mkdir ../results
+for file in `find fluxes*`;
+do
+#Get the numbers in file name
+position=`echo $file | cut -d "_" -f 2`_`echo $file | cut -d "_" -f 3`
+#Get the sum of precipitation for one month and then divide the sum by number of years
+awk '{total[$2] += $4; count[$1]++} END {num=asort(count); for(month in total) printf "%4s  %f  mm/month\n",month,total[month]/num}' $file | sort -k 1 -n > ../results/monthly_precipitation_$position
+awk '{printf "%s %f\n",$1,$2}' ../results/monthly_precipitation_$position > ../results/temp1_$position
+echo $file | cut -d "_" -f 2 > ../results/latitude.$position
+awk '{$2=30901073.51*(1-$1^2/2+$1^4/24-$1^6/720+$1^8/40320)} END {print $2}' ../results/latitude.$position > ../results/temp2_$position
+awk '{for(i=1;i<=12;i++) print $1}' ../results/temp2_$position > ../results/area_$position 
+paste ../results/temp1_$position ../results/area_$position > ../results/info_$position
+done
+
+for file in `find ../results/info*`;
+do
+awk '{print $0}' $file >> ../results/table
+done
+
+awk '{suma[$1]+=$2*$3} END {for(month in suma) printf "%s %f \n",month,suma[month]}' ../results/table | sort -k 1 -n > ../results/temp3
+awk '{sumb[$1]+=$3} END {for(month in sumb) printf "%s %f \n",month,sumb[month]}' ../results/table | sort -k 1 -n | awk '{print $2}' > ../results/temp4
+paste ../results/temp3 ../results/temp4 > ../results/temp5
+awk '{average[$1]=$2/$3} END {for(month in average) printf "areal average rainfall of the month %s : %10.4f mm/month\n",month,average[month]}' ../results/temp5 | sort -k 7 -n > ../results/areal_average
+
+find ../results/temp* | xargs rm 
+find ../results/latitude* | xargs rm
+find ../results/info* | xargs rm
+find ../results/area_* | xargs rm 
+find ../results/table* | xargs rm
+

@@ -1,0 +1,20 @@
+#Question a
+awk '{for(i=1;i<NF+1;i++) sum[i] += $i}  END {for(i=1;i<NF+1;i++) printf "column%4s:%20.4f\n",i,sum[i]/NR}' fluxes_-15.2500_39.2500
+#Question b
+head -n 1000 fluxes_-15.2500_39.2500 | awk '{print $4}' | sort -n | tail -n 1 
+#Question c
+head -n 2000 fluxes_-15.2500_39.2500 | tail -n 1000 | awk '{print $NF}' | sort -n | head -n 1 
+#Question d
+awk '{total[$1] += $4} END {for(year in total) printf "%4s:%15.4f\n",year,total[year]}' fluxes_-15.2500_39.2500 | sort -k 1 -n
+#Question e
+awk '{for(i=NF;i>0;i--) printf "%s   ",$i; printf "\n"}' fluxes_-15.2500_39.2500 > fluxes_-15.2500_39.2500_reversecolumn
+#Question f
+sed -i 's/\./,/g' fluxes_-15.2500_39.2500 
+#Question g
+sed -i 's/\./,/' fluxes_-15.2500_39.2500 
+#Question h
+awk '{gsub(/0/,"a",$1); print $0}' fluxes_-15.2500_39.2500 > fluxes_-15.2500_39.2500_revised
+#Question i
+find . -name 'data_*' -print | xargs chmod 744
+
+

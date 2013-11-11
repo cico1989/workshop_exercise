@@ -1,0 +1,78 @@
+#! /usr/bin/env python
+import os
+import numpy as np
+import sys
+
+##get the latitude and longitude from the file name
+##extract the second column (month) and fourth column (rainfall) from the fluxes files
+current_path = os.getcwd()
+addfolder = current_path,'fluxes'
+folder_path = '/'.join(addfolder)
+results_path = os.path.join(current_path,'results')
+if not os.path.isdir(results_path):
+    os.makedirs(results_path)
+else:
+    answer = raw_input('results folder already existed! Overwrite or not(y/n):')
+    if answer.strip().lower().startswith('y'):
+        for file in os.listdir(results_path):
+            targetfile = os.path.join(results_path, file)
+            if os.path.isfile(targetfile):
+                os.remove(targetfile)
+    else:
+        print 'Overwrite failed! Results may have problems'  
+for file in os.listdir(folder_path):
+    if '~' not in file:   #exclude the automatic backup files which are ends with '~'
+#        print file
+        lat = file.split("_")[1]
+        lon = file.split("_")[2]
+        addfile = folder_path, file
+        filepath = '/'.join(addfile)
+        data = np.loadtxt(filepath,usecols = (0,1,3))
+        monthly_sum = np.zeros([12,1])
+        monthly_mean = np.zeros([12,1])
+##data.shape[0] is the number of rows, data.shape[1] is the number of columns
+        year_count = 1
+        for i in range(1,data.shape[0]):
+            if data[i,0] != data[i-1,0]:
+               year_count = year_count + 1
+            i += i
+#        print year_count
+        for i in range(0,data.shape[0]):
+            monthly_sum[data[i,1]-1] += data[i,2]
+            i += i           
+#        print monthly_sum
+        for i in range(0,12):
+            monthly_mean[i] = monthly_sum[i]/year_count
+#        print monthly_mean
+        tempname = 'monthly','precipitation',lat,lon
+        filename = '_'.join(tempname)
+        results_path_filename = os.path.join(results_path,filename)
+        f = open(results_path_filename,'w')
+        for i in range(0,12):
+            f.write("%2d  %.6f  mm/month\n" % (i+1,monthly_mean[i]))
+        f.close()
+        area_factor = 30901073.51*np.cos(float(lat)*np.pi/180)
+#        print area_factor
+        temp1_path = os.path.join(results_path,'temp1')  
+        for i in range(0,12):
+            f = open(temp1_path,'a')
+            f.write("%2d  %.6f  %.4f\n" % (i+1,monthly_mean[i],area_factor))
+        f.close()
+data1 = np.loadtxt(temp1_path)
+prep_times_area = np.zeros([12,1])
+area_sum = np.zeros([12,1])
+areal_mean = np.zeros([12,1])
+#print prep_times_area
+for i in range(0,data1.shape[0]):
+    prep_times_area[data1[i,0]-1] += data1[i,1]*data1[i,2]
+    area_sum[data1[i,0]-1] += data1[i,2]
+    i += i
+for i in range(0,12):
+    areal_mean[i] = prep_times_area[i]/area_sum[i]
+    i += i
+areal_average_path = os.path.join(results_path,'areal_average')
+f = open(areal_average_path,'w')
+for i in range(0,12):
+    f.write("areal average rainfall of the month %2d:  %.6f  mm/month\n" % (i+1,areal_mean[i]))
+f.close()
+
